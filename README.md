@@ -24,3 +24,8 @@ add path
 ```
 export PATH=/path/to/ansible/bin:/Users/y.hryshkovets/Library/Python/3.11/bin
 ```
+
+```
+terraform init
+```
+
