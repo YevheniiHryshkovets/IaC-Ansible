@@ -54,12 +54,12 @@
 
     - name: Copy configuration to apache2
       ansible.builtin.copy:
-        src: ./files/000-default.conf
+        src: ./configs/proxy2.conf
         dest: /etc/apache2/sites-available/000-default.conf
 
     - name: Copy configuration to apache2
       ansible.builtin.copy:
-        src: ./files/proxy.conf
+        src: ./configs/proxy.conf
         dest: /etc/apache2/mods-enabled/proxy.conf
 
     - name: Restart service apache2, in all cases
