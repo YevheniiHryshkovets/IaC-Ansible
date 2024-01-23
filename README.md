@@ -32,3 +32,11 @@ export PATH=/Users/y.hryshkovets/Library/Python/3.11/bin:$PATH
 terraform init
 ```
 
+```
+terraform apply
+```
+
+```
+ansible-playbook -i hosts.ini jenkins.yml
+```
+

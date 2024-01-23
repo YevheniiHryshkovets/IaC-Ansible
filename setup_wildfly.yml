@@ -1,0 +1,75 @@
+---
+- name: wildfly
+  hosts: your_server
+  become: yes
+  tasks:
+    - name: Update repositories cache
+      apt:
+        update_cache: yes
+        upgrade: yes
+        autoremove: yes
+      become: yes
+      become_user: root
+
+    - name: Install jdk-11
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - openjdk-11-jdk
+      become: yes
+      become_user: root
+
+    - name: directory creation
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /test
+        - /test/wildfly
+      become: yes
+      become_user: root
+
+    - name: download and install WildFly
+      get_url:
+        url: "https://github.com/wildfly/wildfly/releases/download/30.0.0.Final/wildfly-30.0.0.Final.tar.gz"
+        dest: "/opt/wildfly/wildfly-30.0.0.Final.tar.gz"
+      become: yes
+      become_user: root
+      register: wildfly_download
+
+    - name: unpackage WildFly
+      ansible.builtin.unarchive:
+        src: "{{ wildfly_download.dest }}"
+        dest: "/opt/wildfly"
+        remote_src: yes
+        extra_opts: "--strip-components=1"
+      when: wildfly_download.changed
+      become: yes
+      become_user: root
+
+    - name: WildFly user creation
+      user:
+        name: wildfly
+        system: yes
+        shell: /bin/bash
+        home: /opt/wildfly
+      become: yes
+      become_user: root
+
+    - name: setup systemd for WildFly
+      template:
+        src: wildfly.service.j2
+        dest: /etc/systemd/system/wildfly.service
+      notify:
+        - Reload WildFly Service
+      become: yes
+      become_user: root
+
+  handlers:
+    - name: Reload WildFly Service
+      systemd:
+        name: wildfly
+        state: restarted
+      become: yes
+      become_user: root
