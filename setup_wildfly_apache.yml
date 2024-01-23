@@ -1,0 +1,64 @@
+---
+- name: Install only Apache
+  hosts: your_server
+  become: yes
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+        autoremove: yes
+
+    - name: Install necessary packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apache2
+
+    - name: Create directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /test
+
+    - name: Generate SSL certificate
+      command: "openssl req -x509 -days 365 -newkey rsa:2048 -nodes -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt -subj \"/C=US/ST=Admin/L=Zhytomyr/0=Dis/CN=www.example.com\""
+      args:
+        warn: no
+
+    - name: Configure Apache
+      template:
+        src: apache-config.conf.j2
+        dest: /etc/apache2/sites-available/000-default.conf
+      notify:
+        - Reload Apache Service
+
+    - name: Configure proxy module in Apache
+      template:
+        src: proxy.conf.j2
+        dest: /etc/apache2/mods-available/proxy.conf
+      notify:
+        - Reload Apache Service
+
+    - name: Activate necessary Apache modules
+      apache2_module:
+        state: present
+      loop:
+        - ssl
+        - proxy
+        - proxy_http
+        - rewrite
+        - headers
+
+    - name: Reload the system
+      systemd:
+        daemon_reload: yes
+
+  handlers:
+    - name: Reload Apache Service
+      service:
+        name: apache2
+        state: restarted
+

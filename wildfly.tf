@@ -23,7 +23,7 @@ resource "aws_instance" "wildfly-server" {
   vpc_security_group_ids = [aws_security_group.wildfly-server.id]
   key_name               = "0712mac"
   # user_data              = data.template_file.init.rendered
-  user_data = file("./configs/wildfly_setup.sh")
+  # user_data = file("./configs/wildfly_setup.sh")
   tags = {
     Name  = "Wildfly"
     Owner = "Admin"
