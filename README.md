@@ -40,3 +40,18 @@ terraform apply
 ansible-playbook -i hosts.ini jenkins.yml
 ```
 
+```
+terraform apply -target=aws_instance.wildfly-server
+```
+
+```
+terraform apply -target=aws_instance.jenkins-server
+```
+
+```
+terraform apply -target=aws_instance.jenkins-server
+
+ansible-playbook -i hosts.ini setup_jenkins_apache.yml
+
+ansible-playbook -i hosts.ini setup_jenkins.yml
+```

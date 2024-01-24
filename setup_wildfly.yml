@@ -21,7 +21,7 @@
 
     - name: wildfly directory checking
       ansible.builtin.stat:
-        path: /test/wildfly
+        path: /opt/wildfly
       register: wildfly_dir
 
     - name: directory creation
@@ -31,6 +31,7 @@
       loop:
         - /test
         - /test/wildfly
+        - /opt/wildfly
       become: yes
       become_user: root
       when: wildfly_dir.stat.exists == false
@@ -67,13 +68,18 @@
 
     - name: setup systemd for WildFly
       template:
-        src: wildfly.service.j2
+        src: /configs/wildfly.conf
         dest: /etc/systemd/system/wildfly.service
       notify:
         - Reload WildFly Service
       become: yes
       become_user: root
       when: wildfly_dir.stat.exists == false
+
+    - name: Restart service apache2, in all cases
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
 
   handlers:
     - name: Reload WildFly Service

@@ -1,5 +1,5 @@
 ---
-- hosts: wildfly
+- hosts: jenkins
   become: yes
   tasks:
     - name: Update repositories cache
