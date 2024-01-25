@@ -1,65 +1,57 @@
 # IaC-Ansible
+That is documentation for creation jenkins with slave and wildfly instances on AWS
 
-https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
 
+# Setup emvironment
 
+GUIDES:
 Ansible instalation:
+https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
+Terraform instalation:
+https://developer.hashicorp.com/terraform/install
+Git instalation:
+https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+
+# Setup infrastructure
+
+Start by cloning the repository!
 ```
-python3 -m pip install --user ansible
+git clone https://github.com/YevheniiHryshkovets/IaC-Ansible.git
 ```
 
-```
-python3 -m pip install --user ansible-core
-```
-
-```
-python3 -m pip install --user ansible-core==2.12.3
-```
-Ansible update:
-```
-python3 -m pip install --upgrade --user ansible
-```
-
-add path 
-```
-export PATH=/path/to/ansible/bin:/Users/y.hryshkovets/Library/Python/3.11/bin
-```
-```
-export PATH=/Users/y.hryshkovets/Library/Python/3.11/bin:$PATH
-```
-
+Now you can create instances on aws by terraform:
 ```
 terraform init
-```
 
-```
 terraform apply
 ```
 
+Then you need to update hosts on file: hosts.ini
+jenkins_ip  => [jenkins]
+jenkins_slave_ip => [jenkins_slave]
+wildfly_ip => [wildfly]
+
+Now you cat start execute your playbooks:
+
+For Jenkins:
 ```
 ansible-playbook -i hosts.ini jenkins.yml
-```
-
-```
-terraform apply -target=aws_instance.wildfly-server
-```
-
-```
-terraform apply -target=aws_instance.jenkins-server
-```
-
-```
-terraform apply -target=aws_instance.jenkins-server
 
 ansible-playbook -i hosts.ini setup_jenkins_apache.yml
-
-ansible-playbook -i hosts.ini setup_jenkins.yml
 ```
-
+For jenkins-slave:
 ```
-terraform apply -target=aws_instance.wildfly-server
-
+ansible-playbook -i hosts.ini jenkins_slave.yml
+```
+For wildfly:
+```
 ansible-playbook -i hosts.ini setup_wildfly.yml
 
 ansible-playbook -i hosts.ini setup_wildfly_apache.yml
 ```
+
+For remove your infrastructure use terraform:
+```
+terraform destroy
+```
+
