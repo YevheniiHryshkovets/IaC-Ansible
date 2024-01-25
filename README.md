@@ -41,6 +41,7 @@ Place ip addreses from console output like this way:
 ```
 
 Now you cat start execute your playbooks:
+Important! You must use the commands in the order they appear in this document.
 For Jenkins:
 ```
 ansible-playbook -i hosts.ini jenkins.yml
