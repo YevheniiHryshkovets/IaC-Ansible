@@ -27,10 +27,14 @@ terraform apply
 ```
 
 Then you need to update hosts on file: hosts.ini
-jenkins_ip  => [jenkins]
-jenkins_slave_ip => [jenkins_slave]
-wildfly_ip => [wildfly]
+              [jenkins]
+jenkins_ip => "change that value"
 
+                    [jenkins_slave]
+jenkins_slave_ip => "change that value"
+
+              [wildfly]
+wildfly_ip => "change that value"
 Now you cat start execute your playbooks:
 
 For Jenkins:
