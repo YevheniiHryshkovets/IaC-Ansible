@@ -40,8 +40,10 @@ Place ip addreses from console output like this way:
 "wildfly_ip" ansible_ssh_user=example_user ansible_ssh_private_key_file=/example/path/key.pem
 ```
 
-Now you cat start execute your playbooks:
 Important! You must use the commands in the order they appear in this document.
+
+Now you cat start execute your playbooks:
+
 For Jenkins:
 ```
 ansible-playbook -i hosts.ini jenkins.yml
