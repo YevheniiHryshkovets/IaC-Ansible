@@ -3,58 +3,50 @@
   become: yes
   tasks:
     - name: Update repositories cache
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
-        upgrade: yes
-        autoremove: yes
-      become: yes
-      become_user: root
 
     - name: Install jdk-11
-      apt:
-        name: "{{ item }}"
+      ansible.builtin.apt:
+        name: openjdk-11-jdk
         state: present
-      loop:
-        - openjdk-11-jdk
-      become: yes
-      become_user: root
 
     - name: wildfly directory checking
       ansible.builtin.stat:
         path: /opt/wildfly
       register: wildfly_dir
 
+    - name: test directory checking
+      ansible.builtin.stat:
+        path: /test
+      register: test_dir
+
     - name: directory creation
       file:
         path: "{{ item }}"
         state: directory
       loop:
-        - /test
-        - /test/wildfly
         - /opt/wildfly
-      become: yes
-      become_user: root
+        - /test
       when: wildfly_dir.stat.exists == false
 
     - name: download and install WildFly
       get_url:
         url: "https://github.com/wildfly/wildfly/releases/download/30.0.0.Final/wildfly-30.0.0.Final.tar.gz"
-        dest: "/opt/wildfly/wildfly-30.0.0.Final.tar.gz"
-      become: yes
-      become_user: root
+        dest: "/opt/wildfly"
       register: wildfly_download
       when: wildfly_dir.stat.exists == false
+      when: test_dir.stat.exists == false
 
     - name: unpackage WildFly
       ansible.builtin.unarchive:
-        src: "{{ wildfly_download.dest }}"
+        src: "/opt/wildfly/wildfly-30.0.0.Final.tar.gz" # "{{ wildfly_download.dest }}"
         dest: "/opt/wildfly"
         remote_src: yes
         extra_opts: "--strip-components=1"
       when: wildfly_download.changed
-      become: yes
-      become_user: root
       when: wildfly_dir.stat.exists == false
+      when: test_dir.stat.exists == false
 
     - name: WildFly user creation
       user:
@@ -62,29 +54,24 @@
         system: yes
         shell: /bin/bash
         home: /opt/wildfly
-      become: yes
-      become_user: root
-      when: wildfly_dir.stat.exists == false
+
+    - name: wildfly ownership seting up
+      file:
+        path: /opt/wildfly
+        state: directory
+        owner: wildfly
+        group: wildfly
+        recurse: yes
 
     - name: setup systemd for WildFly
-      template:
-        src: /configs/wildfly.conf
+      ansible.builtin.copy:
+        src: ./configs/wildfly.service
         dest: /etc/systemd/system/wildfly.service
-      notify:
-        - Reload WildFly Service
-      become: yes
-      become_user: root
+      notify: Restart WildFly
       when: wildfly_dir.stat.exists == false
 
-    - name: Restart service apache2, in all cases
-      ansible.builtin.service:
-        name: apache2
-        state: restarted
-
   handlers:
-    - name: Reload WildFly Service
-      systemd:
+    - name: Restart WildFly
+      ansible.builtin.systemd:
         name: wildfly
         state: restarted
-      become: yes
-      become_user: root

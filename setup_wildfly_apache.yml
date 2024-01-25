@@ -17,9 +17,16 @@
         - "proxy"
         - "proxy_http"
         - "ssl"
+        - "rewrite"
+        - "headers"
       # notify:
       #   - restart apache
       register: a2enmod
+
+    - name: Restart service apache2, in all cases
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
 
     - name: Check if /etc/apache2/ssl/ directory exists
       ansible.builtin.stat:
@@ -65,4 +72,9 @@
     - name: Restart service apache2, in all cases
       ansible.builtin.service:
         name: apache2
+        state: restarted
+
+    - name: Restart WildFly
+      ansible.builtin.systemd:
+        name: wildfly
         state: restarted
