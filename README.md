@@ -27,16 +27,20 @@ terraform apply
 ```
 
 Then you need to update hosts on file: hosts.ini
-              [jenkins]
-jenkins_ip => "change that value"
+Place ip addreses from console output like this way:
 
-                    [jenkins_slave]
-jenkins_slave_ip => "change that value"
+```
+[jenkins]
+"jenkins_ip" ansible_ssh_user=example_user ansible_ssh_private_key_file=/example/path/key.pem
 
-              [wildfly]
-wildfly_ip => "change that value"
+[jenkins_slave]
+"jenkins_slave_ip" ansible_ssh_user=example_user ansible_ssh_private_key_file=/example/path/key.pem
+
+[wildfly]
+"wildfly_ip" ansible_ssh_user=example_user ansible_ssh_private_key_file=/example/path/key.pem
+```
+
 Now you cat start execute your playbooks:
-
 For Jenkins:
 ```
 ansible-playbook -i hosts.ini jenkins.yml
